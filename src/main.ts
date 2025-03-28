@@ -58,12 +58,39 @@ async function initWebGPU() {
   new Float32Array(vertexBuffer.getMappedRange()).set(vertices);
   vertexBuffer.unmap();
 
+  // Create orb vertex buffer
+  const orbPos = [0.5, 0.5];
+
+  const orbVertices = new Float32Array([
+    -0.05, -0.05,
+    0.05, -0.05,
+    0.0, 0.05
+  ]);
+
+  const orbBuffer = device.createBuffer({
+    size: orbVertices.byteLength,
+    usage: GPUBufferUsage.VERTEX,
+    mappedAtCreation: true,
+  });
+  new Float32Array(orbBuffer.getMappedRange()).set(orbVertices);
+  orbBuffer.unmap();
+
+
   // Create model matrix and uniform buffer
   const modelMatrix = mat4.create();
   const matrixBuffer = device.createBuffer({
     size: 64,
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   });
+
+  // Create model matrix and uniform buffer for orb
+  const orbMatrix = mat4.create();
+  const orbMatrixBuffer = device.createBuffer({
+    size: 64,
+    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+  });
+  mat4.translate(orbMatrix, orbMatrix, [orbPos[0], orbPos[1], 0]);
+    device.queue.writeBuffer(orbMatrixBuffer, 0, orbMatrix as Float32Array);
 
   // Shader with transformation support
   const shaderModule = device.createShaderModule({
@@ -77,9 +104,10 @@ async function initWebGPU() {
       }
 
       @fragment
-      fn fs_main() -> @location(0) vec4<f32> {
-        return vec4<f32>(0.2, 0.7, 1.0, 1.0); // light blue
-      }
+        fn fs_main() -> @location(0) vec4<f32> {
+        let dist = distance(vec2<f32>(0.0, 0.0), vec2<f32>(0.0, 0.0));
+        return vec4<f32>(1.0, 0.8, 0.2, 1.0); // yellow orb for now
+        }
     `,
   });
 
@@ -124,6 +152,16 @@ async function initWebGPU() {
     ],
   });
 
+  const orbBindGroup = device.createBindGroup({
+    layout: bindGroupLayout,
+    entries: [{
+        binding: 0,
+        resource: {
+            buffer: orbMatrixBuffer,
+        }
+    }]
+  })
+
   function frame() {
     // Update transformation matrix based on player position
     mat4.identity(modelMatrix);
@@ -145,10 +183,18 @@ async function initWebGPU() {
     });
 
     renderPass.setPipeline(pipeline);
+
+    // Draw player triangle
     renderPass.setVertexBuffer(0, vertexBuffer);
     renderPass.setBindGroup(0, bindGroup);
     renderPass.draw(3);
-    renderPass.end();
+
+    // Draw the glowing orb
+    renderPass.setVertexBuffer(0, orbBuffer);
+    renderPass.setBindGroup(0, orbBindGroup);
+    renderPass.draw(3);
+
+    renderPass.end(); // Only end the render pass once everything has been drawn
 
     device.queue.submit([commandEncoder.finish()]);
     requestAnimationFrame(frame);
