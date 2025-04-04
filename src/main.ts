@@ -1,38 +1,29 @@
 /// <reference types="@webgpu/types" />
 
+/**
+ *
+ * WebGPU setup and rendering
+ *
+ */
+
 import { mat4 } from 'gl-matrix';
+import { createKeyboardInput } from './keyboardnavigation';
 
 // Track player position
-let playerPos = [0, 0];
-
-// Listen for keyboard input
-window.addEventListener('keydown', (e) => {
-    const step = 0.05;
-    switch (e.key) {
-        case 'ArrowUp':
-            playerPos[1] += step;
-            break;
-        case 'ArrowDown':
-            playerPos[1] -= step;
-            break;
-        case 'ArrowLeft':
-            playerPos[0] -= step;
-            break;
-        case 'ArrowRight':
-            playerPos[0] += step;
-            break;
-    }
-});
+let playerPos: [number, number] = [0, 0];
+createKeyboardInput(playerPos);
 
 async function initWebGPU() {
     if (!navigator.gpu) {
         throw new Error('WebGPU is not supported in this browser.');
     }
 
+    // Setting up the connection between the GPU and the canvas
     const canvas = document.querySelector('canvas') as HTMLCanvasElement;
     const adapter = await navigator.gpu.requestAdapter();
-    const device = await adapter!.requestDevice();
 
+    // Request access to the GPU device and prepare it for drawing
+    const device = await adapter!.requestDevice();
     const context = canvas.getContext('webgpu') as GPUCanvasContext;
     const format = navigator.gpu.getPreferredCanvasFormat();
 
@@ -45,7 +36,7 @@ async function initWebGPU() {
     // Triangle vertex positions
     const vertices = new Float32Array([-0.5, -0.5, 0.5, -0.5, 0.0, 0.5]);
 
-    // Create vertex buffer
+    // Create vertex buffer for storing for the GPU to use when drawing
     const vertexBuffer = device.createBuffer({
         size: vertices.byteLength,
         usage: GPUBufferUsage.VERTEX,
