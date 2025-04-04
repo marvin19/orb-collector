@@ -1,7 +1,7 @@
 /// <reference types="@webgpu/types" />
 
 import { mat4 } from 'gl-matrix';
-import { createKeyboardInput } from './logic/keyboardnavigation';
+import { createKeyboardInput } from './logic/KeyboardNavigation';
 import { createCircleVertices } from './utils/geometry';
 import {
     createTrianglePipeline,

@@ -4,30 +4,53 @@
  *
  */
 
+import { gameFieldBounds, triangleMargin, movementStep } from './constants';
+
 // Mutable references to single or double values
 export type Vec2 = [number, number];
 export type Vec1 = [number];
 
 export function createKeyboardInput(position: Vec2, angle: Vec1): void {
     window.addEventListener('keydown', (e) => {
-        const step = 0.05;
+        let [x, y] = position;
+
         switch (e.key) {
             case 'ArrowUp':
-                position[1] += step;
-                angle[0] = 0; // Up
+                if (y + movementStep + triangleMargin <= gameFieldBounds.top) {
+                    y += movementStep;
+                    angle[0] = 0;
+                }
                 break;
+
             case 'ArrowDown':
-                position[1] -= step;
-                angle[0] = Math.PI; // Down
+                if (
+                    y - movementStep - triangleMargin >=
+                    gameFieldBounds.bottom
+                ) {
+                    y -= movementStep;
+                    angle[0] = Math.PI;
+                }
                 break;
+
             case 'ArrowLeft':
-                position[0] -= step;
-                angle[0] = Math.PI / 2; // Left (CCW from up)
+                if (x - movementStep - triangleMargin >= gameFieldBounds.left) {
+                    x -= movementStep;
+                    angle[0] = Math.PI / 2;
+                }
                 break;
+
             case 'ArrowRight':
-                position[0] += step;
-                angle[0] = -Math.PI / 2; // Right (CW from up)
+                if (
+                    x + movementStep + triangleMargin <=
+                    gameFieldBounds.right
+                ) {
+                    x += movementStep;
+                    angle[0] = -Math.PI / 2;
+                }
                 break;
         }
+
+        position[0] = x;
+        position[1] = y;
     });
 }
