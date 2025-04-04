@@ -11,7 +11,10 @@ import { createKeyboardInput } from './keyboardnavigation';
 
 // Track player position
 let playerPos: [number, number] = [0, 0];
-createKeyboardInput(playerPos);
+let playerAngle: [number] = [0];
+
+// Create keyboard input for player position
+createKeyboardInput(playerPos, playerAngle);
 
 async function initWebGPU() {
     if (!navigator.gpu) {
@@ -45,13 +48,14 @@ async function initWebGPU() {
     new Float32Array(vertexBuffer.getMappedRange()).set(vertices);
     vertexBuffer.unmap();
 
-    // Create orb vertex buffer
     const orbPos = [0.5, 0.5];
 
+    // Orb vertex positions
     const orbVertices = new Float32Array([
         -0.05, -0.05, 0.05, -0.05, 0.0, 0.05,
     ]);
 
+    // Create orb vertex buffer
     const orbBuffer = device.createBuffer({
         size: orbVertices.byteLength,
         usage: GPUBufferUsage.VERTEX,
@@ -60,7 +64,7 @@ async function initWebGPU() {
     new Float32Array(orbBuffer.getMappedRange()).set(orbVertices);
     orbBuffer.unmap();
 
-    // Create model matrix and uniform buffer
+    // Create model matrix and uniform buffer, used to move objects in space
     const modelMatrix = mat4.create();
     const matrixBuffer = device.createBuffer({
         size: 64,
@@ -156,6 +160,9 @@ async function initWebGPU() {
             playerPos[1],
             0,
         ]);
+        mat4.rotateZ(modelMatrix, modelMatrix, playerAngle[0]);
+        mat4.translate(modelMatrix, modelMatrix, [0, -0.25, 0]); // optional: pivot shift
+
         device.queue.writeBuffer(matrixBuffer, 0, modelMatrix as Float32Array);
 
         const commandEncoder = device.createCommandEncoder();
