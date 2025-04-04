@@ -21,7 +21,7 @@ async function main() {
 
     // Triangle (player) vertex data
     const triangleVertices = new Float32Array([
-        -0.5, -0.5, 0.5, -0.5, 0.0, 0.5,
+        -0.025, -0.025, 0.025, -0.025, 0.0, 0.025,
     ]);
     const triangleBuffer = createVertexBuffer(device, triangleVertices);
 

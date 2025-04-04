@@ -34,10 +34,15 @@ export function drawFrame({
     circleSegments: number;
 }) {
     // Update transformation matrix for the player
+    // Update transformation matrix for the player
     const modelMatrix = mat4.create();
     mat4.translate(modelMatrix, modelMatrix, [playerPos[0], playerPos[1], 0]);
     mat4.rotateZ(modelMatrix, modelMatrix, playerAngle[0]);
-    mat4.translate(modelMatrix, modelMatrix, [0, -0.25, 0]);
+
+    // Calculate pivot dynamically (based on triangle size)
+    const triangleHeight = 0.05;
+    const pivotOffset = -triangleHeight / 2;
+    mat4.translate(modelMatrix, modelMatrix, [0, pivotOffset, 0]);
 
     device.queue.writeBuffer(matrixBuffer, 0, modelMatrix as Float32Array);
 
