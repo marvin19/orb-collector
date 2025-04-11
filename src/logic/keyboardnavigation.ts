@@ -12,7 +12,7 @@ import {
     Vec2,
 } from './constants';
 
-import { playProximityTone, playThud } from './proximity';
+import { playProximityTone, playThud, playOrbCollect } from './proximity';
 
 import { resetOrbPosition, checkOrbCollision } from './orb';
 import { updateScoreUI } from './GameState';
@@ -89,6 +89,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
             score += 1;
             resetOrbPosition();
             updateScoreUI(score);
+            playOrbCollect();
         }
     });
 }
