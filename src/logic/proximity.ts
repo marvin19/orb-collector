@@ -45,3 +45,21 @@ export function playProximityTone(playerPos: Vec2) {
     osc.start();
     osc.stop(ctx.currentTime + 0.07);
 }
+
+export function playThud() {
+    const ctx = getContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.value = 100; // Frequency of the thud sound
+
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); // Very short
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+}

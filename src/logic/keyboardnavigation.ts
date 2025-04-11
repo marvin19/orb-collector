@@ -12,7 +12,7 @@ import {
     Vec2,
 } from './constants';
 
-import { playProximityTone } from './proximity';
+import { playProximityTone, playThud } from './proximity';
 
 import { resetOrbPosition, checkOrbCollision } from './orb';
 import { updateScoreUI } from './GameState';
@@ -30,6 +30,8 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     y += movementStep;
                     angle[0] = 0;
                     moved = true;
+                } else {
+                    playThud();
                 }
                 break;
 
@@ -41,6 +43,8 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     y -= movementStep;
                     angle[0] = Math.PI;
                     moved = true;
+                } else {
+                    playThud();
                 }
                 break;
 
@@ -49,6 +53,8 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     x -= movementStep;
                     angle[0] = Math.PI / 2;
                     moved = true;
+                } else {
+                    playThud();
                 }
                 break;
 
@@ -61,6 +67,8 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     x += movementStep;
                     angle[0] = -Math.PI / 2;
                     moved = true;
+                } else {
+                    playThud();
                 }
                 break;
         }
