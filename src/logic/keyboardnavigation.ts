@@ -40,6 +40,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                 break;
 
             case 'ArrowRight':
+                angle[0] = -Math.PI / 2;
                 if (
                     x + movementStep + triangleMargin <=
                     gameFieldBounds.right
