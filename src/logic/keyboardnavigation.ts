@@ -12,10 +12,13 @@ import {
     Vec2,
 } from './constants';
 
+import { playProximityTone } from './proximity';
+
 import { resetOrbPosition, checkOrbCollision } from './orb';
 import { updateScoreUI } from './GameState';
 
 let score = 0;
+let moved = false;
 
 export function createKeyboardInput(position: Vec2, angle: Vec1): void {
     window.addEventListener('keydown', (e) => {
@@ -26,6 +29,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                 if (y + movementStep + triangleMargin <= gameFieldBounds.top) {
                     y += movementStep;
                     angle[0] = 0;
+                    moved = true;
                 }
                 break;
 
@@ -36,6 +40,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                 ) {
                     y -= movementStep;
                     angle[0] = Math.PI;
+                    moved = true;
                 }
                 break;
 
@@ -43,6 +48,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                 if (x - movementStep - triangleMargin >= gameFieldBounds.left) {
                     x -= movementStep;
                     angle[0] = Math.PI / 2;
+                    moved = true;
                 }
                 break;
 
@@ -54,6 +60,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                 ) {
                     x += movementStep;
                     angle[0] = -Math.PI / 2;
+                    moved = true;
                 }
                 break;
         }
@@ -62,6 +69,11 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
         position[1] = y;
 
         console.log(`Position: ${position}`);
+
+        if (moved) {
+            playProximityTone(position);
+            moved = false;
+        }
 
         // Check for collision
         if (checkOrbCollision(position)) {
