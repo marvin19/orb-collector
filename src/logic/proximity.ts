@@ -25,6 +25,7 @@ export function playProximityTone(playerPos: Vec2) {
     const freq = 200 + proximity * 800; // Frequency range from 200 to 1000 Hz
     const vol = 0.05 + proximity * 0.2; // Volume range from 0.05 to 0.25
 
+    const panner = ctx.createStereoPanner();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
@@ -33,6 +34,10 @@ export function playProximityTone(playerPos: Vec2) {
 
     gain.gain.setValueAtTime(vol, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07); // Very short
+
+    // pan: -1 = left, 0.center, 1 = right
+    const pan = Math.max(-1, Math.min(1, playerPos[0]));
+    panner.pan.value = pan;
 
     osc.connect(gain);
     gain.connect(ctx.destination);
