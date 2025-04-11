@@ -4,11 +4,18 @@
  *
  */
 
-import { gameFieldBounds, triangleMargin, movementStep } from './constants';
+import {
+    gameFieldBounds,
+    triangleMargin,
+    movementStep,
+    Vec1,
+    Vec2,
+} from './constants';
 
-// Mutable references to single or double values
-export type Vec2 = [number, number];
-export type Vec1 = [number];
+import { resetOrbPosition, checkOrbCollision } from './orb';
+import { updateScoreUI } from './GameState';
+
+let score = 0;
 
 export function createKeyboardInput(position: Vec2, angle: Vec1): void {
     window.addEventListener('keydown', (e) => {
@@ -53,5 +60,12 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
 
         position[0] = x;
         position[1] = y;
+
+        // Check for collision
+        if (checkOrbCollision(position)) {
+            score += 1;
+            resetOrbPosition();
+            updateScoreUI(score);
+        }
     });
 }
