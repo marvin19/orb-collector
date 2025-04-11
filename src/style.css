@@ -1,7 +1,13 @@
 body {
     margin: 0;
     background: #000;
-  }
-  canvas {
+}
+canvas {
     display: block;
-  }
+}
+
+#gameContainer {
+    border: 7px solid green;
+    border-radius: 10px;
+    display: inline-block;
+}
