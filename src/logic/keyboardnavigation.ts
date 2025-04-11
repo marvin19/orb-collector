@@ -61,8 +61,11 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
         position[0] = x;
         position[1] = y;
 
+        console.log(`Position: ${position}`);
+
         // Check for collision
         if (checkOrbCollision(position)) {
+            console.log('Collision detected!');
             score += 1;
             resetOrbPosition();
             updateScoreUI(score);

@@ -1,6 +1,5 @@
 /// <reference types="@webgpu/types" />
 
-import { mat4 } from 'gl-matrix';
 import { createKeyboardInput } from './logic/KeyboardNavigation';
 import { createCircleVertices } from './utils/geometry';
 import {
@@ -10,6 +9,7 @@ import {
 import { createVertexBuffer, createUniformBuffer } from './rendering/buffers';
 import { initWebGPU } from './rendering/initWebGPU';
 import { drawFrame } from './rendering/drawFrame';
+import { orbPosition } from './logic/orb';
 
 let playerPos: [number, number] = [0, 0];
 let playerAngle: [number] = [0];
@@ -33,11 +33,6 @@ async function main() {
     // Create uniform buffers
     const triangleMatrixBuffer = createUniformBuffer(device, 64);
     const orbMatrixBuffer = createUniformBuffer(device, 64);
-
-    // Set static orb transform
-    const orbMatrix = mat4.create();
-    mat4.translate(orbMatrix, orbMatrix, [0.5, 0.5, 0]);
-    device.queue.writeBuffer(orbMatrixBuffer, 0, orbMatrix as Float32Array);
 
     // Create pipelines
     const trianglePipeline = createTrianglePipeline(device, format);
@@ -64,7 +59,7 @@ async function main() {
         ],
     });
 
-    // 🌀 Start rendering loop
+    // Start rendering loop
     function frame() {
         drawFrame({
             device,
@@ -78,6 +73,8 @@ async function main() {
             playerPos,
             playerAngle,
             matrixBuffer: triangleMatrixBuffer,
+            orbMatrixBuffer,
+            orbPosition,
             circleSegments,
         });
 

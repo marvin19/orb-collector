@@ -2,7 +2,6 @@ import { mat4 } from 'gl-matrix';
 
 /**
  * drawFrame - Renders a frame using WebGPU.
- * @param param0
  *
  */
 
@@ -18,6 +17,8 @@ export function drawFrame({
     playerPos,
     playerAngle,
     matrixBuffer,
+    orbMatrixBuffer,
+    orbPosition,
     circleSegments,
 }: {
     device: GPUDevice;
@@ -31,10 +32,11 @@ export function drawFrame({
     playerPos: [number, number];
     playerAngle: [number];
     matrixBuffer: GPUBuffer;
+    orbMatrixBuffer: GPUBuffer;
+    orbPosition: [number, number];
     circleSegments: number;
 }) {
-    // Update transformation matrix for the player
-    // Update transformation matrix for the player
+    // Update transformation matrix for the player (player matrix)
     const modelMatrix = mat4.create();
     mat4.translate(modelMatrix, modelMatrix, [playerPos[0], playerPos[1], 0]);
     mat4.rotateZ(modelMatrix, modelMatrix, playerAngle[0]);
@@ -43,12 +45,17 @@ export function drawFrame({
     const triangleHeight = 0.05;
     const pivotOffset = -triangleHeight / 2;
     mat4.translate(modelMatrix, modelMatrix, [0, pivotOffset, 0]);
-
     device.queue.writeBuffer(matrixBuffer, 0, modelMatrix as Float32Array);
+
+    // Orb matrix
+    const orbMatrix = mat4.create();
+    mat4.translate(orbMatrix, orbMatrix, [orbPosition[0], orbPosition[1], 0]);
+    device.queue.writeBuffer(orbMatrixBuffer, 0, orbMatrix as Float32Array);
 
     // Render pass
     const encoder = device.createCommandEncoder();
     const textureView = context.getCurrentTexture().createView();
+
     const pass = encoder.beginRenderPass({
         colorAttachments: [
             {
