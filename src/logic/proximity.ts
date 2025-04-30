@@ -23,7 +23,7 @@ export function playProximityTone(playerPos: Vec2) {
     const proximity = Math.max(0, 1 - distance / maxDist);
 
     const freq = 200 + proximity * 800; // Frequency range from 200 to 1000 Hz
-    const vol = 0.05 + proximity * 0.2; // Volume range from 0.05 to 0.25
+    const vol = 0.5 + proximity * 0.2;
 
     const panner = ctx.createStereoPanner();
     const osc = ctx.createOscillator();
