@@ -1,6 +1,6 @@
 /// <reference types="@webgpu/types" />
 
-import { createKeyboardInput } from './logic/KeyboardNavigation';
+import { createKeyboardInput } from './logic/keyboardnavigation';
 import { createCircleVertices } from './utils/geometry';
 import {
     createTrianglePipeline,
