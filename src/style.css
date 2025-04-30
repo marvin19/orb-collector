@@ -6,6 +6,7 @@ body {
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
+    font-family: 'Courier New', Courier, monospace;
 }
 canvas {
     display: block;
@@ -40,4 +41,9 @@ canvas {
 
 #gameState > div {
     padding: 0 10px;
+}
+
+#gameSettings {
+    color: white;
+    margin-bottom: 20px;
 }
