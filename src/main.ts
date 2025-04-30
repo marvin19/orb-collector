@@ -64,10 +64,42 @@ async function main() {
     ) as HTMLInputElement;
     const blackoutOverlay = document.getElementById('blackoutOverlay');
 
+    // Restore saved setting on page load
+    const savedBlackout = localStorage.getItem('blackout');
+    if (savedBlackout === 'true') {
+        blackoutToggle.checked = true;
+        blackoutOverlay!.style.display = 'block';
+    }
+
+    // Listen for changes and save
     blackoutToggle.addEventListener('change', () => {
-        blackoutOverlay!.style.display = blackoutToggle.checked
-            ? 'block'
-            : 'none';
+        const enabled = blackoutToggle.checked;
+        blackoutOverlay!.style.display = enabled ? 'block' : 'none';
+        localStorage.setItem('blackout', enabled.toString());
+    });
+
+    document.addEventListener('keydown', (e) => {
+        // Only toggle if user is not typing in a form field
+        if (
+            e.key.toLowerCase() === 'b' &&
+            !(
+                e.target instanceof HTMLInputElement ||
+                e.target instanceof HTMLTextAreaElement
+            )
+        ) {
+            blackoutToggle.checked = !blackoutToggle.checked;
+
+            const enabled = blackoutToggle.checked;
+            blackoutOverlay!.style.display = enabled ? 'block' : 'none';
+            localStorage.setItem('blackout', enabled.toString());
+
+            const status = document.getElementById('blackoutStatus');
+            if (status) {
+                status.textContent = enabled
+                    ? 'Blackout mode enabled. Visuals hidden.'
+                    : 'Blackout mode disabled. Visuals shown.';
+            }
+        }
     });
 
     // Start rendering loop
