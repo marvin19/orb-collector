@@ -18,7 +18,6 @@ import { resetOrbPosition, checkOrbCollision } from './orb';
 import { updateScoreUI } from './GameState';
 
 let score = 0;
-
 let moved = false;
 
 export function createKeyboardInput(position: Vec2, angle: Vec1): void {
