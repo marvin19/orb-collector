@@ -59,6 +59,17 @@ async function main() {
         ],
     });
 
+    const blackoutToggle = document.getElementById(
+        'audioOnlyToggle'
+    ) as HTMLInputElement;
+    const blackoutOverlay = document.getElementById('blackoutOverlay');
+
+    blackoutToggle.addEventListener('change', () => {
+        blackoutOverlay!.style.display = blackoutToggle.checked
+            ? 'block'
+            : 'none';
+    });
+
     // Start rendering loop
     function frame() {
         drawFrame({

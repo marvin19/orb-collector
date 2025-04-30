@@ -13,6 +13,7 @@ canvas {
 }
 
 #gameContainer {
+    position: relative;
     border: 7px solid green;
     border-radius: 10px;
     display: inline-block;
@@ -46,4 +47,17 @@ canvas {
 #gameSettings {
     color: white;
     margin-bottom: 20px;
+}
+
+#blackoutOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    opacity: 0.98;
+    pointer-events: none;
+    z-index: 5;
+    display: none;
 }
