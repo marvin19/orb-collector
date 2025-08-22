@@ -1,7 +1,10 @@
 /// <reference types="@webgpu/types" />
 
 import { createKeyboardInput } from './logic/keyboardnavigation';
-import { createCircleVertices } from './utils/geometry';
+import {
+    createCircleVertices,
+    createPointyTriangleVertices,
+} from './utils/geometry';
 import {
     createTrianglePipeline,
     createGlowPipeline,
@@ -19,9 +22,7 @@ createKeyboardInput(playerPos, playerAngle);
 async function main() {
     const { device, context, format } = await initWebGPU();
 
-    const triangleVertices = new Float32Array([
-        -0.025, -0.025, 0.025, -0.025, 0.0, 0.025,
-    ]);
+    const triangleVertices = createPointyTriangleVertices();
     const triangleBuffer = createVertexBuffer(device, triangleVertices);
 
     const circleSegments = 32;

@@ -12,3 +12,20 @@ export function createCircleVertices(
     }
     return new Float32Array(data);
 }
+
+export function createPointyTriangleVertices() {
+    const h = 0.12; // Total height
+    const w = 0.03; // Half of the base width
+
+    const tipY = h * 0.5;
+    const baseY = -h * 0.5;
+
+    return new Float32Array([
+        0.0,
+        tipY, // Tip
+        -w,
+        baseY, // Base left
+        w,
+        baseY, // Base right
+    ]);
+}

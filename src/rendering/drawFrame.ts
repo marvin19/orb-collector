@@ -41,10 +41,6 @@ export function drawFrame({
     mat4.translate(modelMatrix, modelMatrix, [playerPos[0], playerPos[1], 0]);
     mat4.rotateZ(modelMatrix, modelMatrix, playerAngle[0]);
 
-    // Calculate pivot dynamically (based on triangle size)
-    const triangleHeight = 0.05;
-    const pivotOffset = -triangleHeight / 2;
-    mat4.translate(modelMatrix, modelMatrix, [0, pivotOffset, 0]);
     device.queue.writeBuffer(matrixBuffer, 0, modelMatrix as Float32Array);
 
     // Orb matrix
