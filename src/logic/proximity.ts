@@ -2,7 +2,6 @@ import { orbPosition } from './orb';
 import { Vec2 } from './constants';
 
 let audioCtx: AudioContext | null = null;
-
 function getContext(): AudioContext {
     if (!audioCtx) {
         audioCtx = new AudioContext();
@@ -10,73 +9,126 @@ function getContext(): AudioContext {
     return audioCtx;
 }
 
-// Plays movement tone that reflects proximity of the orb
+// --- Stereo panning based on orb-relative position ---
+function getOrbRelativePan(playerX: number, orbX: number): number {
+    const toggle = document.getElementById(
+        'stereoToggle'
+    ) as HTMLInputElement | null;
+    const stereoEnabled = toggle?.checked ?? false;
+
+    if (!stereoEnabled) return 0;
+
+    const dx = playerX - orbX;
+    const scaledPan = dx * 5; // Tweak this value for sensitivity
+    return Math.max(-1, Math.min(1, scaledPan));
+}
+
+// --- Vertical distance to volume factor (optional) ---
+function getVerticalVolumeFactor(playerY: number, orbY: number): number {
+    const dy = Math.abs(playerY - orbY);
+    const maxDY = 2;
+    return Math.max(0.5, 1 - dy / maxDY);
+}
+
+// --- Proximity tone rate limiter ---
+let lastToneTime = 0;
+const toneCooldownMs = 50;
+
+/**
+ * Play a movement tone that reflects distance and direction to the orb.
+ * Rate-limited to prevent overload.
+ */
 export function playProximityTone(playerPos: Vec2) {
+    const now = performance.now();
+    if (now - lastToneTime < toneCooldownMs) return;
+    lastToneTime = now;
+
     const ctx = getContext();
 
-    const dx = orbPosition[0] - playerPos[0];
-    const dy = orbPosition[1] - playerPos[1];
-    const distance = Math.sqrt(dx * dx + dy * dy);
+    const [px, py] = playerPos;
+    const [ox, oy] = orbPosition;
 
-    // Normalize distance into [0, 1]
-    const maxDist = Math.sqrt(4); // Diagonal of gameFieldBounds
+    const dx = ox - px;
+    const dy = oy - py;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const maxDist = Math.sqrt(4);
     const proximity = Math.max(0, 1 - distance / maxDist);
 
-    const freq = 200 + proximity * 800; // Frequency range from 200 to 1000 Hz
-    const vol = 0.5 + proximity * 0.2;
+    const freq = 200 + proximity * 800;
+    const baseVolume = 0.5 + proximity * 0.2;
+    const verticalVolume = getVerticalVolumeFactor(py, oy);
 
-    const panner = ctx.createStereoPanner();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const panner = ctx.createStereoPanner();
 
     osc.type = 'sine';
     osc.frequency.value = freq;
 
-    gain.gain.setValueAtTime(vol, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07); // Very short
+    gain.gain.setValueAtTime(baseVolume * verticalVolume, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.1);
 
-    // pan: -1 = left, 0.center, 1 = right
-    const pan = Math.max(-1, Math.min(1, playerPos[0]));
-    panner.pan.value = pan;
+    panner.pan.value = getOrbRelativePan(px, ox);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + 0.07);
-}
-
-export function playThud() {
-    const ctx = getContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'square';
-    osc.frequency.value = 100; // Frequency of the thud sound
-
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1); // Very short
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(panner);
+    panner.connect(ctx.destination);
 
     osc.start();
     osc.stop(ctx.currentTime + 0.1);
 }
 
-export function playOrbCollect() {
+/**
+ * Play a low-pitched "thud" sound when hitting a wall.
+ */
+export function playThud(playerPos: Vec2) {
     const ctx = getContext();
+    const [px] = playerPos;
+    const [ox] = orbPosition;
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const panner = ctx.createStereoPanner();
+
+    osc.type = 'square';
+    osc.frequency.value = 100;
+
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+
+    panner.pan.value = getOrbRelativePan(px, ox);
+
+    osc.connect(gain);
+    gain.connect(panner);
+    panner.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+}
+
+/**
+ * Play a satisfying orb collection sound with random pitch.
+ */
+export function playOrbCollect(playerPos: Vec2) {
+    const ctx = getContext();
+    const [px] = playerPos;
+    const [ox] = orbPosition;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const panner = ctx.createStereoPanner();
 
     osc.type = 'triangle';
     osc.frequency.value = 1000 + Math.random() * 400;
 
     gain.gain.setValueAtTime(0.2, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+    gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+
+    panner.pan.value = getOrbRelativePan(px, ox);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(panner);
+    panner.connect(ctx.destination);
 
     osc.start();
     osc.stop(ctx.currentTime + 0.25);

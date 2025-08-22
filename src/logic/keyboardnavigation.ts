@@ -23,6 +23,7 @@ let moved = false;
 export function createKeyboardInput(position: Vec2, angle: Vec1): void {
     window.addEventListener('keydown', (e) => {
         let [x, y] = position;
+        let moved = false;
 
         switch (e.key) {
             case 'ArrowUp':
@@ -31,7 +32,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     angle[0] = 0;
                     moved = true;
                 } else {
-                    playThud();
+                    playThud(position);
                 }
                 break;
 
@@ -44,7 +45,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     angle[0] = Math.PI;
                     moved = true;
                 } else {
-                    playThud();
+                    playThud(position);
                 }
                 break;
 
@@ -54,7 +55,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     angle[0] = Math.PI / 2;
                     moved = true;
                 } else {
-                    playThud();
+                    playThud(position);
                 }
                 break;
 
@@ -68,7 +69,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
                     angle[0] = -Math.PI / 2;
                     moved = true;
                 } else {
-                    playThud();
+                    playThud(position);
                 }
                 break;
         }
@@ -76,20 +77,16 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
         position[0] = x;
         position[1] = y;
 
-        console.log(`Position: ${position}`);
-
         if (moved) {
             playProximityTone(position);
-            moved = false;
         }
 
         // Check for collision
         if (checkOrbCollision(position)) {
-            console.log('Collision detected!');
             score += 1;
             resetOrbPosition();
             updateScoreUI(score);
-            playOrbCollect();
+            playOrbCollect(position);
         }
     });
 }
