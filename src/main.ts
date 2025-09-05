@@ -108,6 +108,7 @@ async function main() {
     const nextBtn = document.getElementById(
         'nextLevelBtn'
     ) as HTMLButtonElement | null;
+    const gameContainer = document.getElementById('gameContainer');
 
     if (startBtn) {
         startBtn.addEventListener('click', () => {
@@ -119,6 +120,8 @@ async function main() {
             setInputEnabled(true);
             // Ensure audio context is unlocked before gameplay
             ensureAudioRunning();
+            // Remove blur when gameplay starts
+            gameContainer && gameContainer.classList.remove('blur-active');
         });
     }
 
@@ -130,6 +133,8 @@ async function main() {
             resetOrbPosition();
             randomizePlayerPosition(playerPos);
             setNextLevelPending(false);
+            // Remove blur when resuming gameplay
+            gameContainer && gameContainer.classList.remove('blur-active');
         });
     }
 }

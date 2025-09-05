@@ -91,3 +91,9 @@ canvas {
 #nextLevelBtn {
     display: none;
 }
+
+/* Blur/dim effect when an overlay is active */
+.blur-active canvas {
+    filter: blur(8px) brightness(0.6);
+    transition: filter 120ms ease;
+}

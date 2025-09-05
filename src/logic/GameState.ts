@@ -18,6 +18,11 @@ export function showNextLevelButton(show: boolean): void {
             queueMicrotask(() => el.focus());
         }
     }
+    const container = document.getElementById('gameContainer');
+    if (container) {
+        if (show) container.classList.add('blur-active');
+        else container.classList.remove('blur-active');
+    }
 }
 
 export function isNextLevelVisible(): boolean {
