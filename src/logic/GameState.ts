@@ -26,3 +26,11 @@ export function isNextLevelVisible(): boolean {
     ) as HTMLButtonElement | null;
     return !!btn && btn.style.display !== 'none';
 }
+
+let nextLevelPending = false;
+export function setNextLevelPending(pending: boolean): void {
+    nextLevelPending = pending;
+}
+export function isNextLevelPending(): boolean {
+    return nextLevelPending;
+}

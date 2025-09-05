@@ -14,6 +14,10 @@ async function getContext(): Promise<AudioContext> {
     return audioCtx;
 }
 
+export async function ensureAudioRunning(): Promise<void> {
+    await getContext();
+}
+
 // --- Stereo panning based on orb-relative position ---
 function getOrbRelativePan(playerX: number, orbX: number): number {
     const toggle = document.getElementById(

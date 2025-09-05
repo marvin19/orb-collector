@@ -7,8 +7,13 @@ import {
     createPointyTriangleVertices,
 } from './utils/geometry';
 import { initCanvas2D, drawFrame2D } from './rendering/canvas2d';
+import { ensureAudioRunning } from './logic/proximity';
 import { orbPosition, resetOrbPosition } from './logic/orb';
-import { updateLevelUI, showNextLevelButton } from './logic/GameState';
+import {
+    updateLevelUI,
+    showNextLevelButton,
+    setNextLevelPending,
+} from './logic/GameState';
 import { randomizePlayerPosition } from './logic/player';
 
 let playerPos: [number, number] = [0, 0];
@@ -112,6 +117,8 @@ async function main() {
             updateLevelUI(level);
             showNextLevelButton(false);
             setInputEnabled(true);
+            // Ensure audio context is unlocked before gameplay
+            ensureAudioRunning();
         });
     }
 
@@ -122,6 +129,7 @@ async function main() {
             showNextLevelButton(false);
             resetOrbPosition();
             randomizePlayerPosition(playerPos);
+            setNextLevelPending(false);
         });
     }
 }

@@ -1,4 +1,5 @@
 import { mat4 } from 'gl-matrix';
+import { isNextLevelPending } from '../logic/GameState';
 
 type Vec2 = [number, number];
 
@@ -83,39 +84,32 @@ export function drawFrame2D(params: {
     ctx.fillStyle = 'rgb(255,26,153)';
     ctx.fill();
 
-    // Draw glowing orb by rendering triangles with additive-like effect
-    // We approximate glow by drawing the filled circle with a radial gradient
-    // derived from local position distance, matching shader logic.
-    // Compute circle center in canvas space
-    const [cx, cy] = ndcToCanvas(
-        orbPosition[0],
-        orbPosition[1],
-        canvas.width,
-        canvas.height
-    );
+    if (!isNextLevelPending()) {
+        const [cx, cy] = ndcToCanvas(
+            orbPosition[0],
+            orbPosition[1],
+            canvas.width,
+            canvas.height
+        );
+        if (orbVertices.length >= 6) {
+            const vx = orbVertices[2];
+            const vy = orbVertices[3];
+            const [mx, my] = applyModel(orbModel, [vx, vy]);
+            const [px, py] = ndcToCanvas(mx, my, canvas.width, canvas.height);
+            const dx = px - cx;
+            const dy = py - cy;
+            const radiusPx = Math.hypot(dx, dy);
 
-    // Estimate radius from first non-center vertex (data packed as [0,0, x1,y1, x2,y2] per segment)
-    // Use magnitude of one vertex in NDC scaled to pixels.
-    if (orbVertices.length >= 6) {
-        const vx = orbVertices[2];
-        const vy = orbVertices[3];
-        // transform local vertex by model then map to pixels
-        const [mx, my] = applyModel(orbModel, [vx, vy]);
-        const [px, py] = ndcToCanvas(mx, my, canvas.width, canvas.height);
-        const dx = px - cx;
-        const dy = py - cy;
-        const radiusPx = Math.hypot(dx, dy);
+            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radiusPx);
+            grad.addColorStop(0.0, 'rgba(255,204,51,1.0)');
+            grad.addColorStop(0.3, 'rgba(255,204,51,0.7)');
+            grad.addColorStop(0.6, 'rgba(255,204,51,0.25)');
+            grad.addColorStop(1.0, 'rgba(255,204,51,0.0)');
 
-        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radiusPx);
-        // Match shader glow/core falloff roughly
-        grad.addColorStop(0.0, 'rgba(255,204,51,1.0)');
-        grad.addColorStop(0.3, 'rgba(255,204,51,0.7)');
-        grad.addColorStop(0.6, 'rgba(255,204,51,0.25)');
-        grad.addColorStop(1.0, 'rgba(255,204,51,0.0)');
-
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(cx, cy, radiusPx, 0, Math.PI * 2);
-        ctx.fill();
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radiusPx, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
 }

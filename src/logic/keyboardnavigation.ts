@@ -19,6 +19,7 @@ import {
     updateScoreUI,
     showNextLevelButton,
     isNextLevelVisible,
+    setNextLevelPending,
 } from './GameState';
 
 let score = 0;
@@ -95,6 +96,7 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
         if (checkOrbCollision(position)) {
             score += 1;
             updateScoreUI(score);
+            setNextLevelPending(true);
             showNextLevelButton(true);
             playOrbCollect(position);
         }
