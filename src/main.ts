@@ -1,13 +1,19 @@
-import { createKeyboardInput } from './logic/keyboardnavigation';
+import {
+    createKeyboardInput,
+    setInputEnabled,
+} from './logic/keyboardnavigation';
 import {
     createCircleVertices,
     createPointyTriangleVertices,
 } from './utils/geometry';
 import { initCanvas2D, drawFrame2D } from './rendering/canvas2d';
-import { orbPosition } from './logic/orb';
+import { orbPosition, resetOrbPosition } from './logic/orb';
+import { updateLevelUI, showNextLevelButton } from './logic/GameState';
+import { randomizePlayerPosition } from './logic/player';
 
 let playerPos: [number, number] = [0, 0];
 let playerAngle: [number] = [0];
+let level: number = 1;
 
 createKeyboardInput(playerPos, playerAngle);
 
@@ -89,6 +95,35 @@ async function main() {
     }
 
     requestAnimationFrame(frame);
+
+    // Buttons
+    const startBtn = document.getElementById(
+        'startGameBtn'
+    ) as HTMLButtonElement | null;
+    const nextBtn = document.getElementById(
+        'nextLevelBtn'
+    ) as HTMLButtonElement | null;
+
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            // Give immediate visual feedback: hide Start button and reset level display
+            startBtn.style.display = 'none';
+            level = 1;
+            updateLevelUI(level);
+            showNextLevelButton(false);
+            setInputEnabled(true);
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            level += 1;
+            updateLevelUI(level);
+            showNextLevelButton(false);
+            resetOrbPosition();
+            randomizePlayerPosition(playerPos);
+        });
+    }
 }
 
 main();

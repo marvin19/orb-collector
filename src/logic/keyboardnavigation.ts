@@ -15,12 +15,23 @@ import {
 import { playProximityTone, playThud, playOrbCollect } from './proximity';
 
 import { resetOrbPosition, checkOrbCollision } from './orb';
-import { updateScoreUI } from './GameState';
+import {
+    updateScoreUI,
+    showNextLevelButton,
+    isNextLevelVisible,
+} from './GameState';
 
 let score = 0;
 
+let inputEnabled = false;
+export function setInputEnabled(enabled: boolean): void {
+    inputEnabled = enabled;
+}
+
 export function createKeyboardInput(position: Vec2, angle: Vec1): void {
     window.addEventListener('keydown', (e) => {
+        if (!inputEnabled) return;
+        if (isNextLevelVisible()) return; // ignore arrows while next level is up
         let [x, y] = position;
         let moved = false;
 
@@ -83,8 +94,8 @@ export function createKeyboardInput(position: Vec2, angle: Vec1): void {
         // Check for collision
         if (checkOrbCollision(position)) {
             score += 1;
-            resetOrbPosition();
             updateScoreUI(score);
+            showNextLevelButton(true);
             playOrbCollect(position);
         }
     });
