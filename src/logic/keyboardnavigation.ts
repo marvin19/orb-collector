@@ -14,7 +14,7 @@ import {
 
 import { playProximityTone, playThud, playOrbCollect } from './proximity';
 
-import { resetOrbPosition, checkOrbCollision } from './orb';
+import { checkOrbCollision } from './orb';
 import {
     updateScoreUI,
     showNextLevelButton,
